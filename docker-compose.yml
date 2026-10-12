@@ -1,0 +1,9 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: parceiro90
+      POSTGRES_USER: parceiro
+      POSTGRES_PASSWORD: parceiro
+    ports:
+      - "5432:5432"
