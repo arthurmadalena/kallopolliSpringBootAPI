@@ -28,6 +28,9 @@ public class ColaboradorEntity {
     private LocalDate dataAdmissao;
     private boolean ativo = true;
 
+    public ColaboradorEntity() {
+    }
+
     public ColaboradorEntity(Long id, String colaboradorName, String colaboradorTelefone, Paper papel, LojaEntity loja, ColaboradorEntity gestor, LocalDate dataAdmissao, boolean ativo) {
         this.id = id;
         this.colaboradorName = colaboradorName;
