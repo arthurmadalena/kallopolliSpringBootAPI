@@ -265,14 +265,5 @@ Regra de ouro: **nunca edite uma migration já aplicada**; toda mudança vira um
 
 O sistema lida com relatos sensíveis de colaboradores. Antes de uso com pessoas reais, é obrigatório definir autenticação, controle de acesso por papel (o gestor nunca vê relatos sobre ele), auditoria de acessos e política de retenção de dados.
 
----
-
-## Equipe
-
-- **API (Java / Spring Boot):** [NOME]
-- **IA (Python / FastAPI):** [NOMES]
-- **Demais integrantes:** [NOMES]
-
----
 
 Projeto desenvolvido para a **Kallopolli**.
