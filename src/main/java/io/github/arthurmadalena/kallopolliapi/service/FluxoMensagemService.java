@@ -19,15 +19,19 @@ public class FluxoMensagemService {
     private final MensagemRepository mensagemRepository;
     private final ServicoIA servicoIA;
     private final EnviadorMensagem enviador;
+    private final PontuacaoService pontuacaoService;
 
     public FluxoMensagemService(ColaboradorRepository colaboradorRepository,
                                 MensagemRepository mensagemRepository,
                                 ServicoIA servicoIA,
-                                EnviadorMensagem enviador) {
+                                EnviadorMensagem enviador,
+                                PontuacaoService pontuacaoService) {
         this.colaboradorRepository = colaboradorRepository;
         this.mensagemRepository = mensagemRepository;
         this.servicoIA = servicoIA;
         this.enviador = enviador;
+        this.pontuacaoService = pontuacaoService;
+
     }
 
     public WebhookResponse processar(WebhookRequest req) {
@@ -36,6 +40,9 @@ public class FluxoMensagemService {
 
         // 1. Salva a mensagem recebida (antes de chamar a IA, para não perder se ela falhar)
         var entrada = salvar(colaborador, DirecaoMensagem.ENTRADA, req.texto());
+
+        // 1.1 Pontos por responder o assistente (1 vez por dia)
+        pontuacaoService.registrarRespostaIA(colaborador, req.texto());
 
         // 2. Pergunta para a IA
         var ia = servicoIA.analisar(colaborador.getId(), req.texto());
