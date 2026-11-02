@@ -2,7 +2,7 @@ package io.github.arthurmadalena.kallopolliapi.entities;
 
 import jakarta.persistence.*;
 
-import java.awt.print.Paper;
+
 import java.time.LocalDate;
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public class ColaboradorEntity {
 
 
     @Enumerated(EnumType.STRING)
-    private Paper papel;
+    private Papel papel;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "loja_id")
@@ -35,7 +35,7 @@ public class ColaboradorEntity {
     public ColaboradorEntity() {
     }
 
-    public ColaboradorEntity(Long id, String colaboradorName, String colaboradorTelefone, Paper papel, LojaEntity loja, ColaboradorEntity gestor, LocalDate dataAdmissao, boolean ativo) {
+    public ColaboradorEntity(Long id, String colaboradorName, String colaboradorTelefone, Papel papel, LojaEntity loja, ColaboradorEntity gestor, LocalDate dataAdmissao, boolean ativo) {
         this.id = id;
         this.colaboradorName = colaboradorName;
         this.colaboradorTelefone = colaboradorTelefone;
@@ -80,11 +80,11 @@ public class ColaboradorEntity {
         this.colaboradorTelefone = colaboradorTelefone;
     }
 
-    public Paper getPapel() {
+    public Papel getPapel() {
         return papel;
     }
 
-    public void setPapel(Paper papel) {
+    public void setPapel(Papel papel) {
         this.papel = papel;
     }
 
