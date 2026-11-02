@@ -13,6 +13,10 @@ public class ColaboradorEntity {
     private Long id;
     private String colaboradorName;
     private String colaboradorTelefone;
+    private String funcao;
+    private boolean mentorDisponivel = false;
+
+
 
     @Enumerated(EnumType.STRING)
     private Paper papel;
@@ -41,6 +45,16 @@ public class ColaboradorEntity {
         this.dataAdmissao = dataAdmissao;
         this.ativo = ativo;
     }
+
+    public String getFuncao() {
+        return funcao;
+    }
+
+    public void setFuncao(String funcao) {
+        this.funcao = funcao;
+    }
+
+
 
     public Long getId() {
         return id;
@@ -130,5 +144,13 @@ public class ColaboradorEntity {
                 ", dataAdmissao=" + dataAdmissao +
                 ", ativo=" + ativo +
                 '}';
+    }
+
+    public boolean isMentorDisponivel() {
+        return mentorDisponivel;
+    }
+
+    public void setMentorDisponivel(boolean mentorDisponivel) {
+        this.mentorDisponivel = mentorDisponivel;
     }
 }
