@@ -13,7 +13,7 @@ public class ConclusaoCursoEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne (fetch = FetchType.LAZY)
     @JoinColumn(name = "colaborador_id")
     private ColaboradorEntity colaborador;
 
