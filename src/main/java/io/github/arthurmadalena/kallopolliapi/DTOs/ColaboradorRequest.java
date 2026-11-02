@@ -11,7 +11,9 @@ public record ColaboradorRequest (@NotBlank String colaboradorName,
                                   @NotNull Paper papel,
                                   @NotNull Long lojaId,
                                   Long gestorId,
-                                  @NotNull LocalDate dataAdmissao)
+                                  @NotNull LocalDate dataAdmissao,
+                                  String funcao,
+                                  Boolean mentorDisponivel)
 {
 
 }
