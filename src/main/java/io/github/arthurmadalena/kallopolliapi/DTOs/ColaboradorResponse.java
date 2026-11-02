@@ -1,11 +1,13 @@
 package io.github.arthurmadalena.kallopolliapi.DTOs;
 
-import java.awt.print.Paper;
+import io.github.arthurmadalena.kallopolliapi.entities.Papel;
+
+
 
 public record ColaboradorResponse(Long id,
                                   String colaboradorName,
                                   String colaboradorTelefone,
-                                  Paper papel,
+                                  Papel papel,
                                   Long lojaId,
                                   String funcao,
                                   boolean mentorDisponivel) {

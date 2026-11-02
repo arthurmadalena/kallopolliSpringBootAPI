@@ -1,7 +1,8 @@
+
 package io.github.arthurmadalena.kallopolliapi.entities;
 
 import jakarta.persistence.*;
-
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -9,15 +10,18 @@ import java.util.Objects;
 @Entity
 @Table(name = "colaborador")
 public class ColaboradorEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String colaboradorName;
     private String colaboradorTelefone;
     private String funcao;
+
     private boolean mentorDisponivel = false;
 
-
-
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Papel papel;
 
@@ -30,12 +34,22 @@ public class ColaboradorEntity {
     private ColaboradorEntity gestor;
 
     private LocalDate dataAdmissao;
+
     private boolean ativo = true;
 
     public ColaboradorEntity() {
     }
 
-    public ColaboradorEntity(Long id, String colaboradorName, String colaboradorTelefone, Papel papel, LojaEntity loja, ColaboradorEntity gestor, LocalDate dataAdmissao, boolean ativo) {
+    public ColaboradorEntity(
+            Long id,
+            String colaboradorName,
+            String colaboradorTelefone,
+            Papel papel,
+            LojaEntity loja,
+            ColaboradorEntity gestor,
+            LocalDate dataAdmissao,
+            boolean ativo
+    ) {
         this.id = id;
         this.colaboradorName = colaboradorName;
         this.colaboradorTelefone = colaboradorTelefone;
@@ -53,8 +67,6 @@ public class ColaboradorEntity {
     public void setFuncao(String funcao) {
         this.funcao = funcao;
     }
-
-
 
     public Long getId() {
         return id;
@@ -84,7 +96,7 @@ public class ColaboradorEntity {
         return papel;
     }
 
-    public void setPapel(Papel papel) {
+    public void setPapel(@NotNull Papel papel) {
         this.papel = papel;
     }
 
@@ -120,16 +132,43 @@ public class ColaboradorEntity {
         this.ativo = ativo;
     }
 
+    public boolean isMentorDisponivel() {
+        return mentorDisponivel;
+    }
+
+    public void setMentorDisponivel(boolean mentorDisponivel) {
+        this.mentorDisponivel = mentorDisponivel;
+    }
+
     @Override
     public boolean equals(Object o) {
+        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+
         ColaboradorEntity that = (ColaboradorEntity) o;
-        return ativo == that.ativo && Objects.equals(id, that.id) && Objects.equals(colaboradorName, that.colaboradorName) && Objects.equals(colaboradorTelefone, that.colaboradorTelefone) && Objects.equals(papel, that.papel) && Objects.equals(loja, that.loja) && Objects.equals(gestor, that.gestor) && Objects.equals(dataAdmissao, that.dataAdmissao);
+
+        return ativo == that.ativo
+                && Objects.equals(id, that.id)
+                && Objects.equals(colaboradorName, that.colaboradorName)
+                && Objects.equals(colaboradorTelefone, that.colaboradorTelefone)
+                && papel == that.papel
+                && Objects.equals(loja, that.loja)
+                && Objects.equals(gestor, that.gestor)
+                && Objects.equals(dataAdmissao, that.dataAdmissao);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, colaboradorName, colaboradorTelefone, papel, loja, gestor, dataAdmissao, ativo);
+        return Objects.hash(
+                id,
+                colaboradorName,
+                colaboradorTelefone,
+                papel,
+                loja,
+                gestor,
+                dataAdmissao,
+                ativo
+        );
     }
 
     @Override
@@ -144,13 +183,5 @@ public class ColaboradorEntity {
                 ", dataAdmissao=" + dataAdmissao +
                 ", ativo=" + ativo +
                 '}';
-    }
-
-    public boolean isMentorDisponivel() {
-        return mentorDisponivel;
-    }
-
-    public void setMentorDisponivel(boolean mentorDisponivel) {
-        this.mentorDisponivel = mentorDisponivel;
     }
 }
