@@ -20,4 +20,9 @@ public class GlobalExceptionHandler{
     return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, detalhe);
   }
 
+  @ExceptionHandler(RegraNegocioException.class)
+  public ProblemDetail regraNegocio(RegraNegocioException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
 }
