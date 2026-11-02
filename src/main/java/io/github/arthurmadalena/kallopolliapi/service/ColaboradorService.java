@@ -32,6 +32,8 @@ public class ColaboradorService {
         c.setPapel(req.papel());
         c.setLoja(loja);
         c.setDataAdmissao(req.dataAdmissao());
+        c.setFuncao(req.funcao());
+        c.setMentorDisponivel(Boolean.TRUE.equals(req.mentorDisponivel()));
 
         if (req.gestorId() != null) {
             var gestor = repository.findById(req.gestorId())
@@ -48,7 +50,14 @@ public class ColaboradorService {
     }
 
     private ColaboradorResponse toResponse(ColaboradorEntity c) {
-        return new ColaboradorResponse(c.getId(), c.getColaboradorName(), c.getColaboradorTelefone(),
-                c.getPapel(), c.getLoja().getId());
+        return new ColaboradorResponse(
+                c.getId(),
+                c.getColaboradorName(),
+                c.getColaboradorTelefone(),
+                c.getPapel(),
+                c.getLoja().getId(),
+                c.getFuncao(),
+                c.isMentorDisponivel()
+        );
     }
 }
