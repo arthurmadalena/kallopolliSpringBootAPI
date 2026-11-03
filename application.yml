@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/parceiro90
@@ -9,3 +12,7 @@ spring:
     open-in-view: false
   flyway:
     enabled: true
+
+app:
+  integracao:
+    api-key: ${INTEGRACAO_API_KEY:dev-chave-local}
