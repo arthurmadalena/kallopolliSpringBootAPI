@@ -1,4 +1,5 @@
 
+
 package io.github.arthurmadalena.kallopolliapi.service;
 
 import io.github.arthurmadalena.kallopolliapi.DTOs.ColaboradorRequest;
@@ -8,6 +9,7 @@ import io.github.arthurmadalena.kallopolliapi.entities.Papel;
 import io.github.arthurmadalena.kallopolliapi.repositories.ColaboradorRepository;
 import io.github.arthurmadalena.kallopolliapi.repositories.LojaRepository;
 import io.github.arthurmadalena.kallopolliapi.shared.RecursoNaoEncontradoException;
+import io.github.arthurmadalena.kallopolliapi.shared.RegraNegocioException;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,47 +21,73 @@ public class ColaboradorService {
 
     private final ColaboradorRepository repository;
     private final LojaRepository lojaRepository;
+    private final JornadaService jornadaService;
 
     public ColaboradorService(
             ColaboradorRepository repository,
-            LojaRepository lojaRepository
+            LojaRepository lojaRepository,
+            JornadaService jornadaService
     ) {
         this.repository = repository;
         this.lojaRepository = lojaRepository;
+        this.jornadaService = jornadaService;
     }
 
     @Transactional
     public ColaboradorResponse criar(ColaboradorRequest req) {
 
+        String telefone = normalizarTelefone(req.colaboradorTelefone());
+
+        if (repository.existsByColaboradorTelefone(telefone)) {
+            throw new RegraNegocioException(
+                    "Já existe um colaborador cadastrado com esse telefone."
+            );
+        }
+
         var loja = lojaRepository.findById(req.lojaId())
                 .orElseThrow(() ->
-                        new RecursoNaoEncontradoException("Loja não encontrada"));
+                        new RecursoNaoEncontradoException("Loja não encontrada."));
 
-        var c = new ColaboradorEntity();
+        ColaboradorEntity colaborador = new ColaboradorEntity();
 
-        c.setColaboradorName(req.colaboradorName());
-        c.setColaboradorTelefone(req.colaboradorTelefone());
-
-        c.setPapel(req.papel());
-
-        c.setLoja(loja);
-        c.setDataAdmissao(req.dataAdmissao());
-        c.setFuncao(req.funcao());
-
-        c.setMentorDisponivel(
+        colaborador.setColaboradorName(req.colaboradorName().trim());
+        colaborador.setColaboradorTelefone(telefone);
+        colaborador.setPapel(req.papel());
+        colaborador.setLoja(loja);
+        colaborador.setDataAdmissao(req.dataAdmissao());
+        colaborador.setFuncao(req.funcao());
+        colaborador.setMentorDisponivel(
                 Boolean.TRUE.equals(req.mentorDisponivel())
         );
 
         if (req.gestorId() != null) {
 
-            var gestor = repository.findById(req.gestorId())
+            ColaboradorEntity gestor = repository.findById(req.gestorId())
                     .orElseThrow(() ->
-                            new RecursoNaoEncontradoException("Gestor não encontrado"));
+                            new RecursoNaoEncontradoException("Gestor não encontrado."));
 
-            c.setGestor(gestor);
+            if (!gestor.isAtivo()) {
+                throw new RegraNegocioException(
+                        "Não é possível vincular um gestor inativo."
+                );
+            }
+
+            colaborador.setGestor(gestor);
         }
 
-        return toResponse(repository.save(c));
+        if (req.papel() == Papel.COLABORADOR && req.gestorId() == null) {
+            throw new RegraNegocioException(
+                    "Um colaborador precisa ter um gestor cadastrado."
+            );
+        }
+
+        ColaboradorEntity salvo = repository.save(colaborador);
+
+        if (salvo.getPapel() == Papel.COLABORADOR) {
+            jornadaService.criarPara(salvo);
+        }
+
+        return toResponse(salvo);
     }
 
     @Transactional(readOnly = true)
@@ -69,6 +97,23 @@ public class ColaboradorService {
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    private String normalizarTelefone(String telefone) {
+
+        if (telefone == null) {
+            throw new RegraNegocioException("Telefone é obrigatório.");
+        }
+
+        String normalizado = telefone.replaceAll("\\D", "");
+
+        if (normalizado.length() < 10 || normalizado.length() > 13) {
+            throw new RegraNegocioException(
+                    "Telefone inválido. Informe DDD e número."
+            );
+        }
+
+        return normalizado;
     }
 
     private ColaboradorResponse toResponse(ColaboradorEntity c) {
