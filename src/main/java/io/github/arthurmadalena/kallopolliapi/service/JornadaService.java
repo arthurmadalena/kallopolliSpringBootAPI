@@ -125,7 +125,7 @@ public class JornadaService {
                     mensagem
             );
 
-            jornada.setUltimaMensagemEm(agora);
+            jornada.setUltimoEnvioCadencia(agora);
             jornada.setTentativasSemResposta(
                     jornada.getTentativasSemResposta() + 1
             );
@@ -140,7 +140,7 @@ public class JornadaService {
             LocalDateTime agora
     ) {
 
-        if (jornada.getUltimaMensagemEm() == null) {
+        if (jornada.getUltimoEnvioCadencia() == null) {
             return true;
         }
 
