@@ -17,6 +17,8 @@ public interface ColaboradorRepository extends JpaRepository<ColaboradorEntity, 
             Long lojaId
     );
 
+    boolean existsByColaboradorTelefone(String colaboradorTelefone);
+
     @Query("""
     select c from ColaboradorEntity c
     where lower(c.funcao) = lower(:funcao)
