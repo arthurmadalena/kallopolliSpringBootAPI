@@ -19,6 +19,9 @@ public class JornadaEntity {
 
     private LocalDate dataInicio;
 
+    @Column(name = "ultimo_envio_cadencia")
+    private LocalDateTime ultimoEnvioCadencia;
+
     @Enumerated(EnumType.STRING)
     private StatusJornada status = StatusJornada.ATIVA;
 
@@ -76,4 +79,13 @@ public class JornadaEntity {
     public void setUltimaMensagemEm(LocalDateTime ultimaMensagemEm) {
         this.ultimaMensagemEm = ultimaMensagemEm;
     }
+
+    public LocalDateTime getUltimoEnvioCadencia() {
+        return ultimoEnvioCadencia;
+    }
+
+    public void setUltimoEnvioCadencia(LocalDateTime ultimoEnvioCadencia) {
+        this.ultimoEnvioCadencia = ultimoEnvioCadencia;
+    }
+
 }
