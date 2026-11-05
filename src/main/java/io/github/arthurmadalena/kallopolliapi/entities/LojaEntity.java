@@ -9,7 +9,10 @@ import java.util.Objects;
 public class LojaEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "nome")
     private String lojaName;
+
+    @Column(name = "cidade")
     private String lojaCity;
 
     public LojaEntity(Long id, String lojaName, String lojaCity) {

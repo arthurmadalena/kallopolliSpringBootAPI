@@ -15,7 +15,10 @@ public class ColaboradorEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "nome")
     private String colaboradorName;
+
+    @Column(name = "telefone")
     private String colaboradorTelefone;
     private String funcao;
 
