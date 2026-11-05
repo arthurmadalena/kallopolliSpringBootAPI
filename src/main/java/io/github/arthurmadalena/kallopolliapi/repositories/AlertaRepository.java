@@ -16,6 +16,8 @@ public interface AlertaRepository extends JpaRepository<AlertaEntity, Long> {
 
     List<AlertaEntity> findByStatusOrderByCriadoEmDesc(String status);
 
+    List<AlertaEntity> findAllByOrderByCriadoEmDesc();
+
     List<AlertaEntity>
     findByStatusAndPrazoLembreteEmBeforeAndLembreteEnviadoFalse(
             String status,
