@@ -1,6 +1,7 @@
 package io.github.arthurmadalena.kallopolliapi.repositories;
 
 import io.github.arthurmadalena.kallopolliapi.entities.ColaboradorEntity;
+import io.github.arthurmadalena.kallopolliapi.entities.Papel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,6 +11,11 @@ import java.util.Optional;
 
 public interface ColaboradorRepository extends JpaRepository<ColaboradorEntity, Long> {
     Optional<ColaboradorEntity> findByColaboradorTelefone(String colaboradorTelefone);
+
+    List<ColaboradorEntity> findByPapelAndLojaIdAndAtivoTrue(
+            Papel papel,
+            Long lojaId
+    );
 
     @Query("""
     select c from ColaboradorEntity c
