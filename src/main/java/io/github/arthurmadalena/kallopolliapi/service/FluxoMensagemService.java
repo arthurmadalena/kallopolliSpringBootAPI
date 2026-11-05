@@ -33,6 +33,7 @@ public class FluxoMensagemService {
     private final PontuacaoService pontuacaoService;
     private final RelatoService relatoService;
     private final ConteudoService conteudoService;
+    private final JornadaService jornadaService;
 
 
 
@@ -43,7 +44,8 @@ public class FluxoMensagemService {
             EnviadorMensagem enviador,
             PontuacaoService pontuacaoService,
             RelatoService relatoService,
-            ConteudoService conteudoService
+            ConteudoService conteudoService,
+            JornadaService jornadaService
 
     ) {
         this.colaboradorRepository = colaboradorRepository;
@@ -53,6 +55,7 @@ public class FluxoMensagemService {
         this.pontuacaoService = pontuacaoService;
         this.relatoService = relatoService;
         this.conteudoService = conteudoService;
+        this.jornadaService = jornadaService;
     }
 
     // Simulador local: usa o stub da IA
@@ -67,6 +70,7 @@ public class FluxoMensagemService {
         );
 
         WebhookResponse resposta = processarClassificada(
+
                 new MensagemProcessadaRequest(
                         req.telefone(),
                         req.texto(),
@@ -75,6 +79,7 @@ public class FluxoMensagemService {
                         ia.alvo(),
                         ia.respostaSugerida()
                 )
+
         );
 
         enviador.enviar(
@@ -89,10 +94,12 @@ public class FluxoMensagemService {
     @Transactional
     public WebhookResponse processarClassificada(
             MensagemProcessadaRequest req
+
     ) {
 
         ColaboradorEntity colaborador =
                 buscarPorTelefone(req.telefone());
+                jornadaService.registrarResposta(colaborador.getId());
 
         // 1. Salva a mensagem recebida
         MensagemEntity entrada = salvar(
