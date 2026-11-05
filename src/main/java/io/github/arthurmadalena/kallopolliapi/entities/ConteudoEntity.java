@@ -2,6 +2,8 @@ package io.github.arthurmadalena.kallopolliapi.entities;
 
 import jakarta.persistence.*;
 
+
+
 @Entity
 @Table(name = "conteudo")
 public class ConteudoEntity {

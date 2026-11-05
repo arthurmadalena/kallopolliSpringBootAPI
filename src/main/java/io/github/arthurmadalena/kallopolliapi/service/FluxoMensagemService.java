@@ -4,6 +4,7 @@ import io.github.arthurmadalena.kallopolliapi.DTOs.MensagemProcessadaRequest;
 import io.github.arthurmadalena.kallopolliapi.DTOs.WebhookRequest;
 import io.github.arthurmadalena.kallopolliapi.DTOs.WebhookResponse;
 import io.github.arthurmadalena.kallopolliapi.entities.ColaboradorEntity;
+import io.github.arthurmadalena.kallopolliapi.entities.ConteudoEntity;
 import io.github.arthurmadalena.kallopolliapi.entities.DirecaoMensagem;
 import io.github.arthurmadalena.kallopolliapi.entities.MensagemEntity;
 import io.github.arthurmadalena.kallopolliapi.ia.ServicoIA;
@@ -11,6 +12,7 @@ import io.github.arthurmadalena.kallopolliapi.repositories.ColaboradorRepository
 import io.github.arthurmadalena.kallopolliapi.repositories.MensagemRepository;
 import io.github.arthurmadalena.kallopolliapi.shared.RecursoNaoEncontradoException;
 import io.github.arthurmadalena.kallopolliapi.whatsapp.EnviadorMensagem;
+
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,9 @@ public class FluxoMensagemService {
     private final EnviadorMensagem enviador;
     private final PontuacaoService pontuacaoService;
     private final RelatoService relatoService;
+    private final ConteudoService conteudoService;
+
+
 
     public FluxoMensagemService(
             ColaboradorRepository colaboradorRepository,
@@ -37,7 +42,9 @@ public class FluxoMensagemService {
             ServicoIA servicoIA,
             EnviadorMensagem enviador,
             PontuacaoService pontuacaoService,
-            RelatoService relatoService
+            RelatoService relatoService,
+            ConteudoService conteudoService
+
     ) {
         this.colaboradorRepository = colaboradorRepository;
         this.mensagemRepository = mensagemRepository;
@@ -45,6 +52,7 @@ public class FluxoMensagemService {
         this.enviador = enviador;
         this.pontuacaoService = pontuacaoService;
         this.relatoService = relatoService;
+        this.conteudoService = conteudoService;
     }
 
     // Simulador local: usa o stub da IA
@@ -159,10 +167,40 @@ public class FluxoMensagemService {
 
                 case "DUVIDA", "DÚVIDA" -> {
 
-                    resposta = "Recebi sua dúvida! Em breve vou consultar " +
-                            "os materiais de treinamento para te ajudar.";
-                }
+                    var conteudos = conteudoService.buscarPorCategoria(req.categoria());
 
+                    if (conteudos.isEmpty()) {
+                        conteudos = conteudoService.listarAtivos();
+                    }
+
+                    if (conteudos.isEmpty()) {
+
+                        resposta = "Ainda não encontrei um material específico sobre " +
+                                "essa dúvida. Vou registrar sua necessidade para que " +
+                                "a equipe possa orientar você.";
+
+                    } else {
+
+                        StringBuilder texto = new StringBuilder();
+
+                        texto.append("Encontrei estas informações nos materiais de treinamento:\n\n");
+
+                        int limite = Math.min(conteudos.size(), 3);
+
+                        for (int i = 0; i < limite; i++) {
+
+                            ConteudoEntity conteudo = conteudos.get(i);
+
+                            texto.append("• ")
+                                    .append(conteudo.getTitulo())
+                                    .append("\n")
+                                    .append(conteudo.getTexto())
+                                    .append("\n\n");
+                        }
+
+                        resposta = texto.toString().trim();
+                    }
+                }
                 default -> {
 
                     resposta = (
