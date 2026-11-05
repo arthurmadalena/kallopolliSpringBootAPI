@@ -1,8 +1,11 @@
+
 package io.github.arthurmadalena.kallopolliapi.service;
 
 import io.github.arthurmadalena.kallopolliapi.entities.*;
 import io.github.arthurmadalena.kallopolliapi.repositories.*;
 import io.github.arthurmadalena.kallopolliapi.shared.RecursoNaoEncontradoException;
+import io.github.arthurmadalena.kallopolliapi.shared.RegraNegocioException;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +29,6 @@ public class RelatoService {
         this.alertas = alertas;
     }
 
-    // Registra o relato, mas ainda não encaminha para ninguém
     @Transactional
     public void abrirPendente(
             ColaboradorEntity autor,
@@ -35,22 +37,38 @@ public class RelatoService {
             String alvo
     ) {
 
+        if (autor == null) {
+            throw new RegraNegocioException("Colaborador não identificado.");
+        }
+
+        if (descricao == null || descricao.isBlank()) {
+            throw new RegraNegocioException("O relato não pode estar vazio.");
+        }
+
+        boolean relataSobreGestor =
+                alvo != null && alvo.trim().equalsIgnoreCase("GESTOR");
+
+        if (relataSobreGestor && autor.getGestor() == null) {
+            throw new RegraNegocioException(
+                    "Não é possível encaminhar um relato sobre gestor: " +
+                            "não existe gestor cadastrado para este colaborador."
+            );
+        }
+
         RelatoEntity relato = new RelatoEntity();
 
         relato.setColaborador(autor);
-        relato.setDescricao(descricao);
+        relato.setDescricao(descricao.trim());
         relato.setCategoria(categoria);
         relato.setStatus("AGUARDANDO_CONFIRMACAO");
 
-        // Se o relato for sobre o gestor, registra quem foi citado
-        if ("GESTOR".equalsIgnoreCase(alvo)) {
+        if (relataSobreGestor) {
             relato.setGestorCitado(autor.getGestor());
         }
 
         relatos.save(relato);
     }
 
-    // Confirma ou cancela o relato
     @Transactional
     public String confirmarPendente(
             ColaboradorEntity autor,
@@ -68,7 +86,6 @@ public class RelatoService {
                         )
                 );
 
-        // Se o colaborador responder NÃO, cancela o encaminhamento
         if (!confirmar) {
 
             relato.setStatus("CANCELADO_PELO_COLABORADOR");
@@ -78,7 +95,6 @@ public class RelatoService {
                     "Se quiser conversar, continuo por aqui.";
         }
 
-        // Se responder SIM, procura o responsável correto
         ColaboradorEntity destinatario =
                 resolverDestinatario(autor, relato.getGestorCitado());
 
@@ -88,14 +104,12 @@ public class RelatoService {
 
         relatos.save(relato);
 
-        // Cria o alerta e envia a notificação
         alertas.criar(relato, destinatario);
 
         return "Obrigado por confirmar. Seu relato foi registrado " +
                 "e encaminhado para a pessoa responsável.";
     }
 
-    // Define quem receberá o relato
     private ColaboradorEntity resolverDestinatario(
             ColaboradorEntity autor,
             ColaboradorEntity gestorCitado
@@ -104,25 +118,18 @@ public class RelatoService {
         ColaboradorEntity candidato;
 
         if (gestorCitado != null) {
-
-            // Se o relato é sobre o gestor, encaminha ao superior dele
             candidato = gestorCitado.getGestor();
-
         } else {
-
-            // Caso normal: encaminha ao gestor do colaborador
             candidato = autor.getGestor();
         }
 
-        // Confere se o destinatário não é o próprio gestor citado
-        if (candidato != null &&
-                (gestorCitado == null ||
-                        !candidato.getId().equals(gestorCitado.getId()))) {
-
+        if (candidato != null
+                && candidato.isAtivo()
+                && (gestorCitado == null
+                || !candidato.getId().equals(gestorCitado.getId()))) {
             return candidato;
         }
 
-        // Se não houver superior disponível, procura um ADMIN da loja
         if (autor.getLoja() != null) {
 
             List<ColaboradorEntity> admins =
@@ -133,21 +140,20 @@ public class RelatoService {
 
             for (ColaboradorEntity admin : admins) {
 
-                if (gestorCitado == null ||
-                        !admin.getId().equals(gestorCitado.getId())) {
-
+                if (gestorCitado == null
+                        || !admin.getId().equals(gestorCitado.getId())) {
                     return admin;
                 }
             }
         }
 
-        throw new IllegalStateException(
+        throw new RegraNegocioException(
                 "Não existe responsável disponível para receber o relato. " +
-                        "Cadastre um ADMIN ou configure o superior do gestor."
+                        "Cadastre um ADMIN ativo ou configure o superior do gestor."
         );
     }
 
-    // Verifica se existe relato aguardando confirmação
+    @Transactional(readOnly = true)
     public boolean temPendente(Long colaboradorId) {
 
         return relatos
