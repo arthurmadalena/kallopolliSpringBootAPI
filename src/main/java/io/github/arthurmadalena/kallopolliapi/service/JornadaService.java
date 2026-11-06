@@ -145,11 +145,10 @@ public class JornadaService {
         }
 
         long horasDesdeUltimoEnvio = ChronoUnit.HOURS.between(
-                jornada.getUltimaMensagemEm(),
+                jornada.getUltimoEnvioCadencia(),
                 agora
         );
 
-        // Evita repetir mensagens no mesmo dia.
         if (horasDesdeUltimoEnvio < 20) {
             return false;
         }
@@ -165,7 +164,7 @@ public class JornadaService {
         }
 
         long diasDesdeUltimoEnvio = ChronoUnit.DAYS.between(
-                jornada.getUltimaMensagemEm().toLocalDate(),
+                jornada.getUltimoEnvioCadencia().toLocalDate(),
                 agora.toLocalDate()
         );
 
