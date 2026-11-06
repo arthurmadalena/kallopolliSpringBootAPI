@@ -2,7 +2,7 @@ package io.github.arthurmadalena.kallopolliapi.entities;
 
 
 import jakarta.persistence.*;
-import jakarta.persistence.Id;
+
 
 import java.time.LocalDateTime;
 
