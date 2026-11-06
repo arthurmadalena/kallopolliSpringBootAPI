@@ -6,6 +6,7 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.stream.Collectors;
 
@@ -66,5 +67,15 @@ public class GlobalExceptionHandler {
             "Ocorreu um erro interno. Entre em contato com o suporte."
     );
   }
+
+  @ExceptionHandler(ResponseStatusException.class)
+  public ProblemDetail erroHttp(ResponseStatusException ex) {
+
+    return ProblemDetail.forStatusAndDetail(
+            ex.getStatusCode(),
+            ex.getReason() == null ? "Erro na requisição." : ex.getReason()
+    );
+  }
+
 }
 
