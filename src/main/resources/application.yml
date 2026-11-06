@@ -19,6 +19,8 @@ spring:
     locations: classpath:db/migration
 
 app:
+  integracao:
+    api-key: ${INTEGRACAO_API_KEY:chave-local-desenvolvimento}
 
   scheduler:
     enabled: ${APP_SCHEDULER_ENABLED:false}
